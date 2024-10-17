@@ -20,12 +20,18 @@ class CounterPage extends StatefulWidget {
 class _CounterPageState extends State<CounterPage> {
   int _counter = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    _getCounterValue();
+  }
+
   Future<void> _incrementCounter() async {
     final response = await http.post(Uri.parse('http://10.0.2.2:8080/api/increment'));
     if (response.statusCode == 200) {
-      _getCounterValue();
+      print("정상 작동");
     } else {
-      print('Failed to increment counter. Status code: ${response.statusCode}');
+      print('숫자 증가 실패: ${response.statusCode}');
     }
   }
 
@@ -35,8 +41,9 @@ class _CounterPageState extends State<CounterPage> {
       setState(() {
         _counter = int.parse(response.body);
       });
+      print("정상 작동");
     } else {
-      print('Failed to get counter value. Status code: ${response.statusCode}');
+      print('숫자 불러오기 실패: ${response.statusCode}');
     }
   }
 
