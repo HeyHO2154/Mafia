@@ -34,8 +34,6 @@ class _MainPageState extends State<MainPage> {
       setState(() {
         _point = jsonDecode(response.body)['point']; // JSON에서 point 값을 추출하여 저장
       });
-    } else {
-      print('포인트 데이터를 가져오는 데 실패했습니다.');
     }
   }
 

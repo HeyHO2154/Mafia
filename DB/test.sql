@@ -3,7 +3,6 @@ CREATE DATABASE hsj;
 
 USE hsj;
 
-
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
 	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -12,6 +11,6 @@ CREATE TABLE users (
     point INT DEFAULT 0
 );
 
-
 SELECT * FROM users;
-UPDATE users SET point = 200 WHERE id = '1';
+UPDATE users SET point = 564 WHERE id = '3';
+DELETE FROM users WHERE id = 4;

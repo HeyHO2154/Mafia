@@ -47,7 +47,7 @@ public class UserController {
     @GetMapping("/points")
     public ResponseEntity<?> getUserPoints(@RequestParam String userId) {
         // userId에 맞는 사용자 포인트를 가져오는 로직
-        int points = userService.getUserPoints(userId); // 가상의 서비스 메서드
+        int points = userService.getUserPoints(userId);
         return ResponseEntity.ok(Collections.singletonMap("point", points));
     }
 }

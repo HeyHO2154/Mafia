@@ -11,10 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MyApp',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      title: '싱글 마피아',
       home: HomePage(), // 홈 페이지를 초기 화면으로 설정
     );
   }

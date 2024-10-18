@@ -19,7 +19,23 @@ class _LoginPageState extends State<LoginPage> {
     final password = passwordController.text;
 
     if (userId.isEmpty || password.isEmpty) {
-      print('아이디와 비밀번호를 입력하세요');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('경고'),
+            content: Text('아이디와 비밀번호를 모두 입력해주세요!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // 다이얼로그 닫기
+                },
+                child: Text('확인'),
+              ),
+            ],
+          );
+        },
+      );
       return;
     }
 
@@ -46,9 +62,25 @@ class _LoginPageState extends State<LoginPage> {
       );
     } else if (response.statusCode == 401) {
       // 비밀번호 불일치
-      print('비밀번호가 일치하지 않습니다.');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('로그인 실패'),
+            content: Text('비밀번호가 틀립니다.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // 다이얼로그 닫기
+                },
+                child: Text('확인'),
+              ),
+            ],
+          );
+        },
+      );
     } else {
-      print('로그인 또는 회원가입 실패');
+      print("로그인 또는 회원가입 실패");
     }
 
     setState(() {
