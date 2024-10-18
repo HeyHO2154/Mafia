@@ -1,32 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert'; // JSON 데이터를 파싱하기 위해 필요
 
 import 'Game/MultiPlay.dart';
 import 'Game/SinglePlay.dart';
 import 'MyInfo.dart';
-import '../CounterTest.dart';
-import 'Guide.dart'; // 게임 설명
+import 'Guide.dart';
+import 'Shop.dart';
 
 class MainPage extends StatefulWidget {
+  final String userId; // 사용자 아이디를 받을 필드
+
+  MainPage({required this.userId}); // 생성자에서 userId 받음
+
   @override
   _MainPageState createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  int _counter = 0;
+  int _point = 0; // point 값을 저장할 변수
 
   @override
   void initState() {
     super.initState();
-    _getCounterValue();
+    _getPointValue(); // 초기화할 때 포인트 값을 가져옴
   }
 
-  Future<void> _getCounterValue() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:8080/api/value'));
+  // userId에 맞는 포인트 데이터를 백엔드에서 가져옴
+  Future<void> _getPointValue() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:8080/api/points?userId=${widget.userId}'));
+
     if (response.statusCode == 200) {
       setState(() {
-        _counter = int.parse(response.body);
+        _point = jsonDecode(response.body)['point']; // JSON에서 point 값을 추출하여 저장
       });
+    } else {
+      print('포인트 데이터를 가져오는 데 실패했습니다.');
     }
   }
 
@@ -44,7 +53,7 @@ class _MainPageState extends State<MainPage> {
                 mainAxisAlignment: MainAxisAlignment.end, // 오른쪽 정렬
                 children: [
                   Text(
-                    '포인트: $_counter',
+                    '포인트: $_point', // point 값을 출력
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
@@ -75,7 +84,7 @@ class _MainPageState extends State<MainPage> {
                     _buildMenuButton(context, '혼자 하기', Icons.person, SinglePlay()), // SinglePlay로 이동
                     _buildMenuButton(context, '같이 하기', Icons.group, MultiPlay()), // MultiPlay로 이동
                     _buildMenuButton(context, '내 정보', Icons.account_circle, MyInfo()), // MyInfo로 이동
-                    _buildMenuButton(context, '상점', Icons.shopping_cart, CounterTest()), // CounterTest로 이동
+                    _buildMenuButton(context, '상점', Icons.shopping_cart, Shop()), // Shop으로 이동
                   ],
                 ),
               ),
@@ -102,6 +111,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  // 메뉴 버튼 빌드 메서드
   Widget _buildMenuButton(BuildContext context, String text, IconData icon, Widget nextPage) {
     return OutlinedButton(
       onPressed: () {
