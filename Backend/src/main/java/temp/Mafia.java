@@ -1,4 +1,4 @@
-package temp;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -50,7 +50,7 @@ public class Mafia {
 			Enemy.putIfAbsent(i, new ArrayList<>());
 		}
 		if(player!=-1) {
-			System.out.println("당신"+player+"은 "+Job[player]+"입니다");
+			System.out.println("당신"+player+"입니다");
 			if(Job[player]==-1) {
 				System.out.println(Alive.get(-1));
 			}
@@ -556,13 +556,13 @@ public class Mafia {
 				//최다공론화(본인제외)
 				temp = suspect_num.clone();
 				temp[i]=0;
-				Vote(i, FindMaxNum(temp).get(0));
+				Vote(i, FindMaxNum(temp).get( (int) (Math.random()*FindMaxNum(temp).size()) ));
 				break;
 			case 0:
 				//최다공론화(본인제외)
 				temp = suspect_num.clone();
 				temp[i]=0;
-				Vote(i, FindMaxNum(temp).get(0));
+				Vote(i, FindMaxNum(temp).get( (int) (Math.random()*FindMaxNum(temp).size()) ));
 				break;
 			case -1:
 				if(!Enemy.get(i).isEmpty()) {
@@ -571,7 +571,7 @@ public class Mafia {
 					//최다공론화(본인제외)
 					temp = suspect_num.clone();
 					temp[i]=0;
-					Vote(i, FindMaxNum(temp).get(0));
+					Vote(i, FindMaxNum(temp).get( (int) (Math.random()*FindMaxNum(temp).size()) ));
 				}
 				break;
 			case -2:
@@ -602,7 +602,7 @@ public class Mafia {
 				//최다공론화(본인제외)
 				temp = suspect_num.clone();
 				temp[i]=0;
-				Vote(i, FindMaxNum(temp).get(0));
+				Vote(i, FindMaxNum(temp).get( (int) (Math.random()*FindMaxNum(temp).size()) ));
 				break;
 			case -1:
 				//특수 직업 - 적대인물 - 랜덤 순으로 투표
