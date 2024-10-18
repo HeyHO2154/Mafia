@@ -39,12 +39,12 @@ class _CounterPageState extends State<CounterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Counter App')),
+      appBar: AppBar(title: Text('MySQL 연동 테스트')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Counter Value: $_counter'),
+            Text('저장된 데이터: $_counter'),
             ElevatedButton(
               onPressed: _incrementCounter,
               child: Text('A 버튼 (숫자 증가)'),
