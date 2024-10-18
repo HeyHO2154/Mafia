@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 public class Counter {
     @Id
     private int id;
-
     private int value;
 
     // Getters and Setters
