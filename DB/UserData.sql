@@ -12,5 +12,5 @@ CREATE TABLE users (
 );
 
 SELECT * FROM users;
-UPDATE users SET point = 564 WHERE id = '3';
+UPDATE users SET point = 1094 WHERE id = '3';
 DELETE FROM users WHERE id = 4;
