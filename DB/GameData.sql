@@ -13,3 +13,30 @@ CREATE TABLE game_state (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (game_id) REFERENCES game(id)
 );
+
+CREATE TABLE game_log (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    game_id INT NOT NULL,                 -- 게임 ID
+    event_type VARCHAR(255),              -- 이벤트 유형 (예: 'vote', 'kill', 'save', 'suspect')
+    user_id VARCHAR(255),                 -- 해당 이벤트를 발생시킨 유저 ID
+    target_user_id VARCHAR(255),          -- 타겟이 된 유저 ID
+    result VARCHAR(255),                  -- 결과 (성공, 실패 등)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (game_id) REFERENCES game(id)
+);
+
+CREATE TABLE vote (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    game_id INT NOT NULL,                  -- 게임 ID
+    voter_id VARCHAR(255) NOT NULL,        -- 투표한 유저 ID
+    target_user_id VARCHAR(255),           -- 투표된 유저 ID
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (game_id) REFERENCES game(id)
+);
+
+CREATE TABLE game (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    status VARCHAR(255) DEFAULT 'ongoing', -- 게임 상태 (예: 'ongoing', 'finished')
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
