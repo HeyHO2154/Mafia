@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/MainPage.dart';
+import 'package:frontend/MainPage/MainPage.dart';
 import 'package:http/http.dart' as http;
 
 class CounterTest extends StatefulWidget {

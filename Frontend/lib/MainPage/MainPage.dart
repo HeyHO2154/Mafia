@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'MainPage/MultiPlay.dart';
-import 'MainPage/SinglePlay.dart'; // 새로운 파일들 임포트
-import 'MainPage/MyInfo.dart';
-import 'CounterTest.dart';
-import 'MainPage/Guide.dart'; // 게임 설명
+import 'Game/MultiPlay.dart';
+import 'Game/SinglePlay.dart';
+import 'MyInfo.dart';
+import '../CounterTest.dart';
+import 'Guide.dart'; // 게임 설명
 
 class MainPage extends StatefulWidget {
   @override
