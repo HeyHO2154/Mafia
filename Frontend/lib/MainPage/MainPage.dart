@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // JSON 데이터를 파싱하기 위해 필요
 
-import 'Game/MultiPlay.dart';
-import 'Game/SinglePlay.dart';
+import 'MultiPlay.dart';
 import 'MyInfo.dart';
 import 'Guide.dart';
 import 'Shop.dart';
+import 'SinglePlay.dart';
 
 class MainPage extends StatefulWidget {
   final String userId; // 사용자 아이디를 받을 필드
@@ -74,15 +74,55 @@ class _MainPageState extends State<MainPage> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(15.0),
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 20,
-                  mainAxisSpacing: 20,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildMenuButton(context, '혼자 하기', Icons.person, SinglePlay()), // SinglePlay로 이동
-                    _buildMenuButton(context, '같이 하기', Icons.group, MultiPlay()), // MultiPlay로 이동
-                    _buildMenuButton(context, '내 정보', Icons.account_circle, MyInfo()), // MyInfo로 이동
-                    _buildMenuButton(context, '상점', Icons.shopping_cart, Shop()), // Shop으로 이동
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: AspectRatio(
+                              aspectRatio: 1.0, // 정사각형 비율
+                              child: _buildMenuButton(context, '혼자 하기', Icons.person, SinglePlay()),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: AspectRatio(
+                              aspectRatio: 1.0, // 정사각형 비율
+                              child: _buildMenuButton(context, '같이 하기', Icons.group, MultiPlay()),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: AspectRatio(
+                              aspectRatio: 1.0, // 정사각형 비율
+                              child: _buildMenuButton(context, '내 저장고', Icons.book, MyInfo()),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: AspectRatio(
+                              aspectRatio: 1.0, // 정사각형 비율
+                              child: _buildMenuButton(context, '상점', Icons.card_giftcard, Shop()),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -102,7 +142,6 @@ class _MainPageState extends State<MainPage> {
                 ),
               ),
             ),
-            SizedBox(height: 30),
           ],
         ),
       ),

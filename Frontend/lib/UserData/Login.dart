@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('user_id', userId);
 
-      // 로그인 또는 회원가입 성공 시 MainPage로 이동
+      // 로그인 또는 회원가입 성공 시 MainPage로 이동(pushReplacement 덕분에 뒤로가기 기록 삭제)
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => MainPage(userId: userId)),

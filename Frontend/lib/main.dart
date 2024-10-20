@@ -27,8 +27,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _checkLoginStatus();
-    //디버그용 초기화
-    _resetPreferences();
+    _resetPreferences(); //디버그용 초기화
   }
 
   // SharedPreferences 초기화 함수 -- 디버깅용-- (자동로그인 기능)
