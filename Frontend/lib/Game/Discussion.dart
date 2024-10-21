@@ -12,7 +12,7 @@ class Discussion extends StatefulWidget {
 }
 
 class _DiscussionState extends State<Discussion> {
-  int player = 0; // 플레이어들의 이름 목록
+  int player = 0; // 플레이어들의 ID 목록
   List<int> job = []; // 각 플레이어의 직업 ID 목록
   List<int> alive = []; // 생존자 정보
   int currentIndex = 0; // 현재 표시할 플레이어 인덱스
@@ -41,11 +41,33 @@ class _DiscussionState extends State<Discussion> {
         setState(() {
           player = data['player']; // player 정보 저장
           job = List<int>.from(data['Job']); // Job[] 배열 저장
-          alive = List<int>.from(data['alive']); // Job[] 배열 저장
+          alive = List<int>.from(data['alive']); // alive[] 배열 저장
           isLoading = false;
         });
       } else {
         print('데이터를 불러오는 데 실패했습니다.');
+      }
+    } catch (e) {
+      print('에러 발생: $e');
+    }
+  }
+
+  // 백엔드로 POST 요청 보내기
+  Future<void> _postDiscussionChoice(int Act) async {
+    final userId = MainPage.currentUserId;
+    final url = Uri.parse('${MyApp.apiUrl}/api/discussion');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'userId': userId, 'Act': Act}),
+      );
+
+      if (response.statusCode == 200) {
+        _showNextPlayer(); // 성공하면 다음 플레이어로 이동
+      } else {
+        print('POST 요청 실패');
       }
     } catch (e) {
       print('에러 발생: $e');
@@ -68,7 +90,7 @@ class _DiscussionState extends State<Discussion> {
 
   // Vote 페이지로 이동하는 함수
   void _goToVotePage() {
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => Vote()), // Vote 페이지로 이동
     );
@@ -92,11 +114,26 @@ class _DiscussionState extends State<Discussion> {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 20),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isLastPlayer() ? _goToVotePage : _showNextPlayer,
-              child: Text(_isLastPlayer() ? '확인' : '다음'), // 버튼 텍스트 변경
-            ),
+            if (currentIndex == player) ...[
+              // 현재 플레이어가 "player"일 때 3개의 버튼 표시
+              ElevatedButton(
+                onPressed: () => _postDiscussionChoice(1), // 선택 1: 의견내기
+                child: Text('의견내기'),
+              ),
+              ElevatedButton(
+                onPressed: () => _postDiscussionChoice(2), // 선택 2: 직업공개
+                child: Text('직업공개'),
+              ),
+              ElevatedButton(
+                onPressed: () => _postDiscussionChoice(3), // 선택 3: 가만있기
+                child: Text('가만있기'),
+              ),
+            ] else ...[
+              ElevatedButton(
+                onPressed: _isLastPlayer() ? _goToVotePage : _showNextPlayer,
+                child: Text(_isLastPlayer() ? '확인' : '다음'), // 버튼 텍스트 변경
+              ),
+            ],
           ],
         ),
       ),

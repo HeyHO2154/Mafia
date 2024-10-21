@@ -1,7 +1,8 @@
 package Main.Game;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -32,15 +33,10 @@ public class GameController {
         response.put("player", gameData.getPlayer());  // player 정보를 반환
         response.put("Job", gameData.getJob());        // Job[] 배열 반환
         //전체 생존자 alive[]로 합침
-        int[] alive = new int[gameData.getAlive().get(1).size()+gameData.getAlive().get(-1).size()];
-        int temp_size = gameData.getAlive().get(-1).size();
-        for (int i = 0; i < alive.length; i++) {
-			if(i<temp_size) {
-				alive[i] = gameData.getAlive().get(-1).get(i);
-			}else {
-				alive[i] = gameData.getAlive().get(1).get(i-temp_size);
-			}
-		}
+        List<Integer> alive = new ArrayList<>();
+        alive.addAll(gameData.getAlive().get(-1));
+        alive.addAll(gameData.getAlive().get(1));
+        alive.sort(null);
         response.put("alive", alive);        // alive[] 반환
 
         return ResponseEntity.ok(response);
@@ -70,4 +66,14 @@ public class GameController {
         return ResponseEntity.ok(response);
     }
     
+    @PostMapping("/discussion")
+    public void discussion(@RequestBody Map<String, Object> request) {
+        String userId = (String) request.get("userId");
+        int Act = (Integer) request.get("Act");
+        Game gameData = gameSessions.get(userId);
+        /*
+         * 플레이어 선택(의견내기, 직업공개, 가만있기)에 따른 변화
+         */
+    }
 }
+

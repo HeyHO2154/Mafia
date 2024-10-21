@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class GameLogic {
 
-	//사용자가 밤에 행동한 직후
+	//밤에 행동
 	static void Night(Game gameData) {
         
         int N = gameData.getN();
@@ -178,6 +178,11 @@ public class GameLogic {
 			return true;
 		}
 		return false;
+	}
+	
+	//낮에 각자 토론
+	static void Discussion(Game gameData) {
+		
 	}
 	
 }
