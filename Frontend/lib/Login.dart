@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../MainPage/MainPage.dart';
+import 'MainPage/MainPage.dart';
+import 'main.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -43,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
-    final url = Uri.parse('http://10.0.2.2:8080/api/login_or_register');
+    final url = Uri.parse('${MyApp.apiUrl}/api/login_or_register');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},

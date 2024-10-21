@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'MainPage/MainPage.dart';
-import 'UserData/Login.dart';
+import 'Login.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
+  //매번 아이피 가져오기 귀찮아서, 이리 설정
+  static const String apiUrl = 'http://10.0.2.2:8080';
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

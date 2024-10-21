@@ -10,8 +10,11 @@ import 'SinglePlay.dart';
 
 class MainPage extends StatefulWidget {
   final String userId; // 사용자 아이디를 받을 필드
+  static String? currentUserId; // 다른 곳에서 접근할 수 있도록 static 변수 선언
 
-  MainPage({required this.userId}); // 생성자에서 userId 받음
+  MainPage({required this.userId}) {
+    currentUserId = userId; // 현재 사용자의 ID를 static 변수에 저장
+  }
 
   @override
   _MainPageState createState() => _MainPageState();
