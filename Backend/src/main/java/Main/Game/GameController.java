@@ -3,6 +3,7 @@ package Main.Game;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,12 +18,29 @@ public class GameController {
     @PostMapping("/start_game")
     public void startGame(@RequestBody Map<String, String> request) {
         String userId = request.get("userId");
+        Game gameData = new Game();	// 플레이어별로 고유한 게임 데이터를 생성
+        gameSessions.put(userId, gameData); //중복 요청시 초기화
+    }
+    
+    @PostMapping("/night")
+    public ResponseEntity<Map<String, Object>> night(@RequestBody Map<String, String> request) {
+        String userId = request.get("userId");
+        Game gameData = gameSessions.get(userId);
 
-        // 플레이어별로 고유한 게임 데이터를 생성
-        Game gameData = new Game();
-        gameSessions.put(userId, gameData);
+        Map<String, Object> response = new HashMap<>();
+        response.put("player", gameData.getPlayer());  // player 정보를 반환
+        response.put("Job", gameData.getJob());        // Job[] 배열 반환
+        response.put("Alive", gameData.getAlive());        // Alive<> 반환
+
+        return ResponseEntity.ok(response);
     }
 
-    // 다른 API 로직 (게임 진행, 결과 처리 등)
-    // "/end_game"하면 해당 id의 데이터를 지우게 하거나 놔둬도 될듯, 어차피 유저1명단 1데이터인 해시맵 구조니까
+    @PostMapping("/night_target")
+    public void night_target(@RequestBody Map<String, Object> request) {
+        String userId = (String) request.get("userId");
+        Game gameData = gameSessions.get(userId);
+
+        gameData.getPick()[gameData.getPlayer()] = (Integer) request.get("target");
+    }
+    
 }

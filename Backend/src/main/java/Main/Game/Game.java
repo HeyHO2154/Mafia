@@ -24,10 +24,38 @@ public class Game {
     private boolean[] find = new boolean[N];  // 경찰이 보유중인 조사 리스트
     private boolean[] find_fake = new boolean[N];  // 경찰행세 마피아의 가짜 결과
 
-    
 	// 생성자
     public Game() {
-        // 초기화 로직을 필요에 따라 추가 가능
+    	// 게임 데이터 초기화 메서드 호출
+        initializeGame();
+    }
+    
+    // 게임 시작 시 데이터를 초기화하는 메서드
+    public void initializeGame() {
+        player = (int) (Math.random()*N);
+        for (int i = 0; i < N; i++) {
+            personal[i] = (int) (Math.random()*4)-2;
+            int job = Job[i];
+            int shuffle = (int) (Math.random()*Job.length);
+            if(shuffle > i) {
+                Job[i] = Job[shuffle];
+                Job[shuffle] = job;
+            }
+            if (Job[i] == -1) {
+                Alive.putIfAbsent(-1, new ArrayList<>());
+                Alive.get(-1).add(i);
+            } else {
+                Alive.putIfAbsent(1, new ArrayList<>());
+                Alive.get(1).add(i);
+            }
+            Enemy.putIfAbsent(i, new ArrayList<>());
+        }
+        if(player != -1) {
+            System.out.println("당신은 " + player + "입니다");
+            if(Job[player] == -1) {
+                System.out.println(Alive.get(-1));
+            }
+        }
     }
     
     public int getN() {
