@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Talk extends StatelessWidget {
+class Discussion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,7 +9,7 @@ class Talk extends StatelessWidget {
       ),
       body: Center(
         child: Text(
-          'Players are discussing during the talk phase.',
+          '토론을 통해 마피아를 찾아보세요',
           style: TextStyle(fontSize: 24),
         ),
       ),

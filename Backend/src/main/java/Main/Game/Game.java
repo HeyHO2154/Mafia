@@ -50,12 +50,6 @@ public class Game {
             }
             Enemy.putIfAbsent(i, new ArrayList<>());
         }
-        if(player != -1) {
-            System.out.println("당신은 " + player + "입니다");
-            if(Job[player] == -1) {
-                System.out.println(Alive.get(-1));
-            }
-        }
     }
     
     public int getN() {

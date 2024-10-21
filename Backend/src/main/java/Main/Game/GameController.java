@@ -1,9 +1,11 @@
 package Main.Game;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +53,25 @@ public class GameController {
         Game gameData = gameSessions.get(userId);
         
         gameData.getPick()[gameData.getPlayer()] = (Integer) request.get("target");
+        GameLogic.Night(gameData); //밤 로직 처리
+    }
+    
+    @PostMapping("/day")
+    public ResponseEntity<Map<String, Object>> day(@RequestBody Map<String, Object> request) {
+        String userId = (String) request.get("userId");
+        Game gameData = gameSessions.get(userId); // 사용자에 맞는 게임 데이터를 가져옴
+
+        Map<String, Object> response = new HashMap<>();
+        if(GameLogic.Day(gameData)) {
+        	response.put("deadPlayer", gameData.getKill());
+        }else {
+        	response.put("deadPlayer", 99);
+        }
+        
+        System.out.println(Arrays.toString(gameData.getJob()));
+        System.out.println(Arrays.toString(gameData.getPick()));
+       
+        return ResponseEntity.ok(response);
     }
     
 }

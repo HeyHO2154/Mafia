@@ -144,15 +144,15 @@ class _NightState extends State<Night> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (job![player!] == 2)
-              _buildTargetSelector('의사입니다. 누구를 치료하시겠습니까?', alive!),
+              _buildTargetSelector('${player} 당신은 의사입니다. 누구를 치료하시겠습니까?', alive!),
             // alive 배열에서 선택
             if (job![player!] == 1)
-              _buildTargetSelector('경찰입니다. 누구를 조사하시겠습니까?', alive!),
+              _buildTargetSelector('${player} 당신은 경찰입니다. 누구를 조사하시겠습니까?', alive!),
             // alive 배열에서 선택
             if (job![player!] == 0) // 시민일 때
               Column(
                 children: [
-                  Text('당신은 시민입니다. 잠을 잡니다.', style: TextStyle(fontSize: 24)),
+                  Text('${player} 당신은 시민입니다. 잠을 잡니다.', style: TextStyle(fontSize: 24)),
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
@@ -164,7 +164,7 @@ class _NightState extends State<Night> {
                 ],
               ),
             if (job![player!] == -1)
-              _buildTargetSelector('당신은 마피아입니다. 누구를 죽이시겠습니까?', alive!),
+              _buildTargetSelector('${player} 당신은 마피아입니다. 누구를 죽이시겠습니까?', alive!),
             // alive 배열에서 선택
           ],
         ),
