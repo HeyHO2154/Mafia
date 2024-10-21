@@ -137,9 +137,6 @@ class _NightState extends State<Night> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Night Phase'),
-      ),
       body: Center(
         child: isLoading
             ? CircularProgressIndicator() // 데이터 로딩 중 표시
