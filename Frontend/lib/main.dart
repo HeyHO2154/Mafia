@@ -34,6 +34,8 @@ class _HomePageState extends State<HomePage> {
     //_resetPreferences(); //디버그용 초기화
   }
 
+  //////////////////////서버 안열려있으면 아예 닫아버리는 구문 추가 필요함
+
   // SharedPreferences 초기화 함수 -- 디버깅용-- (자동로그인 기능)
   Future<void> _resetPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

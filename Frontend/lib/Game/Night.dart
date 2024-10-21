@@ -13,6 +13,7 @@ class Night extends StatefulWidget {
 class _NightState extends State<Night> {
   int? player;
   List<int>? job; // Job[] 정보를 담을 리스트
+  List<int>? alive; // alive[] 정보를 담을 리스트
   int? selectedTarget; // 선택된 대상
   bool isLoading = true; // 데이터 로딩 여부
   bool hasSelected = false; // 플레이어가 대상자를 선택했는지 여부
@@ -40,6 +41,7 @@ class _NightState extends State<Night> {
         setState(() {
           player = data['player']; // player 정보 저장
           job = List<int>.from(data['Job']); // Job[] 배열 저장
+          alive = List<int>.from(data['alive']); // Job[] 배열 저장
           isLoading = false;
         });
       } else {
@@ -52,6 +54,34 @@ class _NightState extends State<Night> {
 
   // 행동 선택 후 백엔드로 POST 전송
   Future<void> _submitAction() async {
+    if (job![player!] == 1) { // 경찰인 경우
+      // 마피아 여부 확인
+      bool isMafia = job![selectedTarget!] == -1;
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('조사 결과'),
+            content: Text(isMafia ? '선택한 대상은 마피아입니다.' : '선택한 대상은 마피아가 아닙니다.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // 다이얼로그 닫기
+                  _submitActionToBackend(); // 결과를 백엔드에 전송하고 Day 페이지로 이동
+                },
+                child: Text('확인'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      _submitActionToBackend(); // 의사나 마피아인 경우 바로 백엔드로 전송
+    }
+  }
+
+  // 백엔드에 선택된 결과 전송
+  Future<void> _submitActionToBackend() async {
     final userId = MainPage.currentUserId;
     final url = Uri.parse('${MyApp.apiUrl}/api/night_target');
     final response = await http.post(
@@ -59,7 +89,7 @@ class _NightState extends State<Night> {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'userId': userId,
-        'target': selectedTarget, // 시민인 경우 target을 null로 보낼 수 있음
+        'target': selectedTarget,
       }),
     );
 
@@ -75,14 +105,14 @@ class _NightState extends State<Night> {
   }
 
   // 대상자를 선택하는 UI
-  Widget _buildTargetSelector(String actionText) {
+  Widget _buildTargetSelector(String actionText, List<int> aliveList) {
     return Column(
       children: [
         Text('$actionText', style: TextStyle(fontSize: 24)),
         SizedBox(height: 10),
         Wrap(
           spacing: 10,
-          children: List<Widget>.generate(8, (index) {
+          children: aliveList.map((index) {
             return ChoiceChip(
               label: Text('$index'),
               selected: selectedTarget == index,
@@ -93,7 +123,7 @@ class _NightState extends State<Night> {
                 });
               },
             );
-          }),
+          }).toList(),
         ),
         SizedBox(height: 20),
         ElevatedButton(
@@ -117,22 +147,28 @@ class _NightState extends State<Night> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (job![player!] == 2)
-              _buildTargetSelector('의사입니다. 누구를 치료하시겠습니까?'),
+              _buildTargetSelector('의사입니다. 누구를 치료하시겠습니까?', alive!),
+            // alive 배열에서 선택
             if (job![player!] == 1)
-              _buildTargetSelector('경찰입니다. 누구를 조사하시겠습니까?'),
+              _buildTargetSelector('경찰입니다. 누구를 조사하시겠습니까?', alive!),
+            // alive 배열에서 선택
             if (job![player!] == 0) // 시민일 때
               Column(
                 children: [
                   Text('당신은 시민입니다. 잠을 잡니다.', style: TextStyle(fontSize: 24)),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: _submitAction, // 바로 Day 페이지로 이동
+                    onPressed: () {
+                      selectedTarget = 99; // 시민의 경우 target을 99로 설정
+                      _submitAction();     // 그 후에 Day 페이지로 이동하는 함수 호출
+                    },
                     child: Text('확인'),
                   ),
                 ],
               ),
             if (job![player!] == -1)
-              _buildTargetSelector('당신은 마피아입니다. 누구를 죽이시겠습니까?'),
+              _buildTargetSelector('당신은 마피아입니다. 누구를 죽이시겠습니까?', alive!),
+            // alive 배열에서 선택
           ],
         ),
       ),

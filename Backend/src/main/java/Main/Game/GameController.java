@@ -30,7 +30,17 @@ public class GameController {
         Map<String, Object> response = new HashMap<>();
         response.put("player", gameData.getPlayer());  // player 정보를 반환
         response.put("Job", gameData.getJob());        // Job[] 배열 반환
-        response.put("Alive", gameData.getAlive());        // Alive<> 반환
+        //전체 생존자 alive[]로 합침
+        int[] alive = new int[8];
+        int temp_size = gameData.getAlive().get(-1).size();
+        for (int i = 0; i < alive.length; i++) {
+			if(i<temp_size) {
+				alive[i] = gameData.getAlive().get(-1).get(i);
+			}else {
+				alive[i] = gameData.getAlive().get(1).get(i-temp_size);
+			}
+		}
+        response.put("alive", alive);        // alive[] 반환
 
         return ResponseEntity.ok(response);
     }
@@ -39,7 +49,7 @@ public class GameController {
     public void night_target(@RequestBody Map<String, Object> request) {
         String userId = (String) request.get("userId");
         Game gameData = gameSessions.get(userId);
-
+        
         gameData.getPick()[gameData.getPlayer()] = (Integer) request.get("target");
     }
     
