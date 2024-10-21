@@ -55,7 +55,7 @@ public class GameController {
     public ResponseEntity<Map<String, Object>> day(@RequestBody Map<String, Object> request) {
         String userId = (String) request.get("userId");
         Game gameData = gameSessions.get(userId); // 사용자에 맞는 게임 데이터를 가져옴
-
+        
         Map<String, Object> response = new HashMap<>();
         if(GameLogic.Day(gameData)) {
         	response.put("deadPlayer", gameData.getKill());
