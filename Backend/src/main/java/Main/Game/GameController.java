@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,8 +23,8 @@ public class GameController {
         gameSessions.put(userId, gameData); //중복 요청시 초기화
     }
     
-    @PostMapping("/night")
-    public ResponseEntity<Map<String, Object>> night(@RequestBody Map<String, String> request) {
+    @PostMapping("/info")
+    public ResponseEntity<Map<String, Object>> info(@RequestBody Map<String, String> request) {
         String userId = request.get("userId");
         Game gameData = gameSessions.get(userId);
 
@@ -33,7 +32,7 @@ public class GameController {
         response.put("player", gameData.getPlayer());  // player 정보를 반환
         response.put("Job", gameData.getJob());        // Job[] 배열 반환
         //전체 생존자 alive[]로 합침
-        int[] alive = new int[8];
+        int[] alive = new int[gameData.getAlive().get(1).size()+gameData.getAlive().get(-1).size()];
         int temp_size = gameData.getAlive().get(-1).size();
         for (int i = 0; i < alive.length; i++) {
 			if(i<temp_size) {
@@ -47,8 +46,8 @@ public class GameController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/night_target")
-    public void night_target(@RequestBody Map<String, Object> request) {
+    @PostMapping("/night")
+    public void night(@RequestBody Map<String, Object> request) {
         String userId = (String) request.get("userId");
         Game gameData = gameSessions.get(userId);
         
@@ -68,9 +67,6 @@ public class GameController {
         	response.put("deadPlayer", 99);
         }
         
-        System.out.println(Arrays.toString(gameData.getJob()));
-        System.out.println(Arrays.toString(gameData.getPick()));
-       
         return ResponseEntity.ok(response);
     }
     

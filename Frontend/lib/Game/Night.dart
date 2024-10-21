@@ -27,7 +27,7 @@ class _NightState extends State<Night> {
   // 백엔드에서 player와 Job[] 데이터를 받아오는 함수
   Future<void> _fetchGameInfo() async {
     final userId = MainPage.currentUserId; // MainPage에서 userId 가져옴
-    final url = Uri.parse('${MyApp.apiUrl}/api/night'); // 백엔드 API 경로
+    final url = Uri.parse('${MyApp.apiUrl}/api/info'); // 백엔드 API 경로
 
     try {
       final response = await http.post(
@@ -83,7 +83,7 @@ class _NightState extends State<Night> {
   // 백엔드에 선택된 결과 전송
   Future<void> _submitActionToBackend() async {
     final userId = MainPage.currentUserId;
-    final url = Uri.parse('${MyApp.apiUrl}/api/night_target');
+    final url = Uri.parse('${MyApp.apiUrl}/api/night');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
