@@ -74,7 +74,7 @@ public class GameController {
         boolean IsMafia = (boolean) request.get("IsMafia");
         Game gameData = gameSessions.get(userId);
 
-        Map<String, String> response = new HashMap<>();       
+        Map<String, String> response = new HashMap<>();
         response.put("message", GameLogic.Discussion(gameData, PlayerId, Act, FakeJob, TargetId, IsMafia));
         return ResponseEntity
                 .ok()

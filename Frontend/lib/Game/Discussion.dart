@@ -18,6 +18,7 @@ class _DiscussionState extends State<Discussion> {
   int currentIndex = 0; // 현재 표시할 플레이어 인덱스
   bool isLoading = true;
   String discussionResult = ""; // 백엔드에서 반환된 대사 문자열 저장
+  bool isPlayerTurnFinished = false; // 플레이어가 선택 후 종료 여부
 
   @override
   void initState() {
@@ -46,7 +47,7 @@ class _DiscussionState extends State<Discussion> {
           isLoading = false;
           // 첫 번째 플레이어가 사람이 아닌 경우만 자동으로 post 호출
           if (alive[currentIndex] != player) {
-            _postDiscussionChoice(alive[currentIndex], 99, 99, 99, false); // 첫 번째 플레이어가 사람일 경우에는 호출하지 않음
+            _postDiscussionChoice(alive[currentIndex], 99, 99, 99, false);
           }
         });
       } else {
@@ -73,6 +74,7 @@ class _DiscussionState extends State<Discussion> {
         final data = jsonDecode(response.body);
         setState(() {
           discussionResult = data['message']; // 서버에서 받은 대사 저장
+          isPlayerTurnFinished = true; // 플레이어가 선택 완료
         });
       } else {
         print('POST 요청 실패');
@@ -168,17 +170,13 @@ class _DiscussionState extends State<Discussion> {
     setState(() {
       if (currentIndex < alive.length - 1) {
         currentIndex++;
+        isPlayerTurnFinished = false; // 새로운 플레이어로 넘어갔으므로 false로 설정
         //플레이어가 사람이 아닌 경우만 자동으로 post 호출
         if (alive[currentIndex] != player) {
-          _postDiscussionChoice(alive[currentIndex], 99, 99, 99, false); // 첫 번째 플레이어가 사람일 경우에는 호출하지 않음
+          _postDiscussionChoice(alive[currentIndex], 99, 99, 99, false);
         }
       }
     });
-  }
-
-  // 모든 플레이어를 순회했는지 확인하는 함수
-  bool _isLastPlayer() {
-    return currentIndex == alive.length - 1;
   }
 
   // Vote 페이지로 이동하는 함수
@@ -200,42 +198,19 @@ class _DiscussionState extends State<Discussion> {
           children: [
             Text(
               alive[currentIndex] == player
-                  ? '당신은...'
+                  ? (isPlayerTurnFinished ? '${alive[currentIndex]}(당신): $discussionResult' : '당신은...')
                   : '${alive[currentIndex]} : $discussionResult',
               style: TextStyle(fontSize: 24),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 20),
-            if (alive[currentIndex] == player) ...[
+            if (alive[currentIndex] == player && !isPlayerTurnFinished) ...[
               // 현재 플레이어가 "player"일 때 3개의 버튼 표시
               ElevatedButton(
                 onPressed: () async {
-                  int fakeJob = 99;
                   int targetId = 99;
-                  bool isMafia = false;
-
-                  // 플레이어가 마피아일 경우에만 fakeJob, isMafia 설정
-                  if (job[currentIndex] == -1) {  // 마피아 여부 확인
-                    fakeJob = await _selectFakeJob();  // 마피아가 선택한 거짓 직업 (1: 경찰, 2: 의사)
-
-                    if (fakeJob == 1 || fakeJob == 2) {
-                      targetId = await _selectTargetId();  // 생존자 중에서 타겟 고르기
-                    }
-
-                    if (fakeJob == 1) {  // FakeJob이 1인 경우 (경찰 역할)
-                      isMafia = await _selectIsMafia();  // 조사 결과가 마피아인지 여부
-                    }
-                  } else {
-                    // 일반 시민이 1번 "의견내기"를 선택한 경우에만 타겟을 선택
-                    targetId = await _selectTargetId();
-                  }
-
-                  _postDiscussionChoice(alive[currentIndex], 1, fakeJob, targetId, isMafia);  // Act 1: 의견내기
-                  if (_isLastPlayer()) {
-                    _goToVotePage(); // 마지막 플레이어일 경우 Vote로 이동
-                  } else {
-                    _showNextPlayer(); // 그 외엔 다음 플레이어로
-                  }
+                  targetId = await _selectTargetId();
+                  _postDiscussionChoice(alive[currentIndex], 1, 99, targetId, false);  // Act 1: 의견내기
                 },
                 child: Text('의견내기'),
               ),
@@ -258,46 +233,25 @@ class _DiscussionState extends State<Discussion> {
                   }
 
                   _postDiscussionChoice(alive[currentIndex], 2, fakeJob, targetId, isMafia);  // Act 2: 직업공개
-                  if (_isLastPlayer()) {
-                    _goToVotePage(); // 마지막 플레이어일 경우 Vote로 이동
-                  } else {
-                    _showNextPlayer(); // 그 외엔 다음 플레이어로
-                  }
                 },
                 child: Text('직업공개'),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  int fakeJob = 99;
-                  int targetId = 99;
-                  bool isMafia = false;
-
-                  if (job[currentIndex] == -1) {
-                    fakeJob = await _selectFakeJob();
-
-                    if (fakeJob == 1 || fakeJob == 2) {
-                      targetId = await _selectTargetId();
-                    }
-
-                    if (fakeJob == 1) {
-                      isMafia = await _selectIsMafia();
-                    }
-                  }
-
-                  _postDiscussionChoice(alive[currentIndex], 3, fakeJob, targetId, isMafia);  // Act 3: 가만있기
-                  if (_isLastPlayer()) {
-                    _goToVotePage(); // 마지막 플레이어일 경우 Vote로 이동
-                  } else {
-                    _showNextPlayer(); // 그 외엔 다음 플레이어로
-                  }
+                  _postDiscussionChoice(alive[currentIndex], 3, 99, 99, false);  // Act 3: 가만있기
                 },
                 child: Text('가만있기'),
               ),
             ] else ...[
               ElevatedButton(
-                onPressed:
-                _isLastPlayer() ? _goToVotePage : _showNextPlayer, // 마지막 사람이면 Vote로 이동
-                child: Text(_isLastPlayer() ? '확인' : '다음'), // 마지막이면 "확인" 표시
+                onPressed: () {
+                  if (currentIndex == alive.length - 1) {
+                    _goToVotePage();  // 마지막 사람이면 Vote 페이지로 이동
+                  } else {
+                    _showNextPlayer();  // 그 외에는 다음 플레이어로 이동
+                  }
+                },
+                child: Text(currentIndex == alive.length - 1 ? '확인' : '다음'),  // 마지막이면 "확인" 표시
               ),
             ],
           ],
