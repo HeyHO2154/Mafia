@@ -67,13 +67,24 @@ public class GameController {
     }
     
     @PostMapping("/discussion")
-    public void discussion(@RequestBody Map<String, Object> request) {
-        String userId = (String) request.get("userId");
-        int Act = (Integer) request.get("Act");
+    public ResponseEntity<Map<String, String>> discussion(@RequestBody Map<String, Object> request) {
+    	String userId = (String) request.get("userId");
+        int PlayerId = (int) request.get("PlayerId");
+        int Act = (int) request.get("Act");
         Game gameData = gameSessions.get(userId);
-        /*
-         * 플레이어 선택(의견내기, 직업공개, 가만있기)에 따른 변화
-         */
+
+        Map<String, String> response = new HashMap<>();
+        if (PlayerId == gameData.getPlayer()) {
+            response.put("message", "플레이어입니다.");
+        } else {
+            response.put("message", "그냥 AI입니다.");
+        }
+
+        return ResponseEntity
+                .ok()
+                .header("Content-Type", "application/json; charset=UTF-8")  // UTF-8로 인코딩
+                .body(response);
     }
+
 }
 

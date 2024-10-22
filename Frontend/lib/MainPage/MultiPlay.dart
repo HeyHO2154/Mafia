@@ -6,7 +6,7 @@ class MultiPlay extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Text(
-          '같이 하기 페이지',
+          '(업데이트 예정)',
           style: TextStyle(fontSize: 24),
         ),
       ),

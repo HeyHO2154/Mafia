@@ -41,7 +41,7 @@ class _NightState extends State<Night> {
         setState(() {
           player = data['player']; // player 정보 저장
           job = List<int>.from(data['Job']); // Job[] 배열 저장
-          alive = List<int>.from(data['alive']); // Job[] 배열 저장
+          alive = List<int>.from(data['alive']); // alive[] 배열 저장
           isLoading = false;
         });
       } else {
@@ -163,12 +163,28 @@ class _NightState extends State<Night> {
                   ),
                 ],
               ),
-            if (job![player!] == -1)
-              _buildTargetSelector('${player} 당신은 마피아입니다. 누구를 죽이시겠습니까?', alive!),
-            // alive 배열에서 선택
+            if (job![player!] == -1) // 마피아인 경우
+              Column(
+                children: [
+                  _buildTargetSelector('${player} 당신은 마피아입니다. 누구를 죽이시겠습니까?', alive!),
+                  SizedBox(height: 10),
+                  Text('${_getMafiaMembers()}', style: TextStyle(color: Colors.red, fontSize: 16)),
+                ],
+              ),
           ],
         ),
       ),
     );
+  }
+
+  // 마피아인 경우 다른 마피아 정보를 문자열로 반환
+  String _getMafiaMembers() {
+    String mafiaMembers = '';
+    for (int i = 0; i < job!.length; i++) {
+      if (i != player! && job![i] == -1) {
+        mafiaMembers += '$i도 마피아입니다. ';
+      }
+    }
+    return mafiaMembers;
   }
 }
