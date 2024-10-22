@@ -71,15 +71,16 @@ public class GameController {
     	String userId = (String) request.get("userId");
         int PlayerId = (int) request.get("PlayerId");
         int Act = (int) request.get("Act");
+        int FakeJob = (int) request.get("FakeJob");
+        int TargetId = (int) request.get("TargetId");
+        boolean IsMafia = (boolean) request.get("IsMafia");
         Game gameData = gameSessions.get(userId);
 
         Map<String, String> response = new HashMap<>();
-        if (PlayerId == gameData.getPlayer()) {
-            response.put("message", "플레이어입니다.");
-        } else {
-            response.put("message", "그냥 AI입니다.");
-        }
-
+        
+        
+        
+        response.put("message", GameLogic.Discussion(gameData, PlayerId, Act, FakeJob, TargetId, IsMafia));
         return ResponseEntity
                 .ok()
                 .header("Content-Type", "application/json; charset=UTF-8")  // UTF-8로 인코딩

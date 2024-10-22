@@ -181,8 +181,8 @@ public class GameLogic {
 	}
 	
 	//낮에 각자 토론
-	static void Discussion(Game gameData) {
-		
+	static String Discussion(Game gameData, int PlayerId, int Act, int FakeJob, int TargetId, boolean IsMafia) {
+		return "난 마피아가 아니에요";
 	}
 	
 }
