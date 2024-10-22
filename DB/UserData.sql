@@ -11,7 +11,7 @@ CREATE TABLE users (
     point INT DEFAULT 0
 );
 
-SELECT * FROM users;
-INSERT INTO users (user_id, password, point) VALUES ('test', '1234', 1094);
-#UPDATE users SET point = 1094 WHERE id = '3';
 DELETE FROM users;
+INSERT INTO users (user_id, password, point) VALUES ('test', '1234', 1094);
+SELECT * FROM users;
+#UPDATE users SET point = 1094 WHERE id = '3';

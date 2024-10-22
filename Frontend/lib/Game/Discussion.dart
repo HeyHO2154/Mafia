@@ -44,7 +44,10 @@ class _DiscussionState extends State<Discussion> {
           job = List<int>.from(data['Job']); // Job[] 배열 저장
           alive = List<int>.from(data['alive']); // alive[] 배열 저장
           isLoading = false;
-          _postDiscussionChoice(alive[currentIndex], 99, 99, 99, false); // 첫 번째 플레이어에 대해 대사 요청
+          // 첫 번째 플레이어가 사람이 아닌 경우만 자동으로 post 호출
+          if (alive[currentIndex] != player) {
+            _postDiscussionChoice(alive[currentIndex], 99, 99, 99, false); // 첫 번째 플레이어가 사람일 경우에는 호출하지 않음
+          }
         });
       } else {
         print('데이터를 불러오는 데 실패했습니다.');
@@ -165,7 +168,10 @@ class _DiscussionState extends State<Discussion> {
     setState(() {
       if (currentIndex < alive.length - 1) {
         currentIndex++;
-        _postDiscussionChoice(alive[currentIndex], 99, 99, 99, false); // 다음 플레이어에 대한 대사 요청
+        //플레이어가 사람이 아닌 경우만 자동으로 post 호출
+        if (alive[currentIndex] != player) {
+          _postDiscussionChoice(alive[currentIndex], 99, 99, 99, false); // 첫 번째 플레이어가 사람일 경우에는 호출하지 않음
+        }
       }
     });
   }
@@ -193,7 +199,9 @@ class _DiscussionState extends State<Discussion> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '${alive[currentIndex]} : $discussionResult',
+              alive[currentIndex] == player
+                  ? '당신은...'
+                  : '${alive[currentIndex]} : $discussionResult',
               style: TextStyle(fontSize: 24),
               textAlign: TextAlign.center,
             ),

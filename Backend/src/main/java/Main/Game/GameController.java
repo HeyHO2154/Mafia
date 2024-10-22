@@ -38,7 +38,6 @@ public class GameController {
         alive.addAll(gameData.getAlive().get(1));
         alive.sort(null);
         response.put("alive", alive);        // alive[] 반환
-
         return ResponseEntity.ok(response);
     }
 
@@ -61,8 +60,7 @@ public class GameController {
         	response.put("deadPlayer", gameData.getKill());
         }else {
         	response.put("deadPlayer", 99);
-        }
-        
+        }     
         return ResponseEntity.ok(response);
     }
     
@@ -76,10 +74,7 @@ public class GameController {
         boolean IsMafia = (boolean) request.get("IsMafia");
         Game gameData = gameSessions.get(userId);
 
-        Map<String, String> response = new HashMap<>();
-        
-        
-        
+        Map<String, String> response = new HashMap<>();       
         response.put("message", GameLogic.Discussion(gameData, PlayerId, Act, FakeJob, TargetId, IsMafia));
         return ResponseEntity
                 .ok()

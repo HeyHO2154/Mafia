@@ -182,7 +182,88 @@ public class GameLogic {
 	
 	//낮에 각자 토론
 	static String Discussion(Game gameData, int PlayerId, int Act, int FakeJob, int TargetId, boolean IsMafia) {
-		return "난 마피아가 아니에요";
+		String message = null;
+		int i = PlayerId;
+        int[] personal = gameData.getPersonal();
+		int[] Job = gameData.getJob();
+		int[] Job_claim = gameData.getJob_claim();
+		Map<Integer, List<Integer>> Alive = gameData.getAlive();
+		Map<Integer, List<Integer>> Enemy = gameData.getEnemy();
+		
+		int who;
+		if(Alive.get(1).contains(i)) {
+			//(명예로운, 순수한)경찰이면 무조건 직업공개
+			if(Job[i]==1 && (personal[i]==1 || personal[i]==0)) {
+				message = GameAct.OpenJob(i, gameData);
+				return message;
+			}
+			//그 외
+			switch (personal[i]) {
+			case 1:
+				message = GameAct.OpenJob(i, gameData);
+				break;
+			case 0:
+				message = GameAct.Nothing(i, gameData);
+				break;
+			case -1:
+				//적대인물 공격 - 직업 공개
+				if(!Enemy.get(i).isEmpty()) {
+					message = GameAct.Suspect(i, GameAct.RandomWho(Enemy.get(i), i), gameData);
+				}else {
+					message = GameAct.OpenJob(i, gameData);
+				}
+				break;
+			case -2:
+				if(!Enemy.get(i).isEmpty()) {
+					//적대인물 의견내기
+					message = GameAct.Suspect(i, GameAct.RandomWho(Enemy.get(i), i), gameData);
+				}else {
+					//아무나 의견내기
+					message = GameAct.Suspect(i, GameAct.RandomWho(GameAct.AliveAll(gameData), i), gameData);
+				}
+				break;
+			}
+		}else if(Alive.get(-1).contains(i)) {
+			//마피아 일때,
+			switch (personal[i]) {
+			case 1:
+				//경찰, 의사 주장자 있으면 공론화
+				List<Integer> target = new ArrayList<>();
+				for (int j = 0; j < Job_claim.length; j++) {
+					if((Job_claim[j]==1 || Job_claim[j]==2) && Alive.get(1).contains(j)) {
+						target.add(j);
+					}
+				}
+				if(!target.isEmpty()) {
+					who = (int) (Math.random()*target.size());
+					message = GameAct.Suspect(i, who, gameData);
+				}else {
+					//가짜 직업 공개
+					GameAct.FakeJob(i, gameData);
+					message = GameAct.OpenJob(i, gameData);
+				}
+				break;
+			case 0:
+				message = GameAct.Nothing(i, gameData);
+				break;
+			case -1:
+				//가짜 직업 공개
+				GameAct.FakeJob(i, gameData);
+				message = GameAct.OpenJob(i, gameData);
+				break;
+			case -2:
+				//적대인물 또는 랜덤 의견내기
+				if(!Enemy.get(i).isEmpty()) {
+					message = GameAct.Suspect(i, GameAct.RandomWho(Enemy.get(i), i), gameData);
+				}else {
+					message = GameAct.Suspect(i, GameAct.RandomWho(Alive.get(1), i), gameData);
+				}
+				break;
+			}
+		}
+		
+		
+		return message;
 	}
 	
 }
