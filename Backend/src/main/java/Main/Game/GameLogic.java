@@ -171,12 +171,13 @@ public class GameLogic {
 			
 	}
 	
-	//낮에 죽은사람 확인
+	//낮에 죽은사람 확인, 투표 초기화(kill, live 는 Night()에서 초기화됨)
 	static boolean Day(Game gameData) {
 		if(gameData.getKill()!=gameData.getLive()) {
 			GameAct.Kick(gameData.getKill(), gameData);
 			return true;
 		}
+		gameData.setVote(new int[gameData.getN()]);
 		return false;
 	}
 	
@@ -298,9 +299,135 @@ public class GameLogic {
 		return message;
 	}
 	
+	//투표 초기화는 Day()에 넣어둠
 	static String Vote(Game gameData, int PlayerId, int TargetId) {
-		String message = "hi";
+		String message = null;
+		int[] vote = gameData.getVote();
+		int i = PlayerId;
+		int[] Job = gameData.getJob();
+		int[] Job_claim = gameData.getJob_claim();
+		int[] personal = gameData.getPersonal();
+		int[] suspect_num = gameData.getSuspect_num();
+		boolean[] find = gameData.getFind();
+		Map<Integer, List<Integer>> Alive = gameData.getAlive();
+		Map<Integer, List<Integer>> Enemy = gameData.getEnemy();
 		
+		if(PlayerId == gameData.getPlayer()) {
+			vote[TargetId]++;
+			message = TargetId+"에게 투표";
+		}else {
+			List<Integer> list = new ArrayList<>();
+			int[] temp;
+			int who;
+			if(Alive.get(1).contains(i)) {
+				//경찰이면 무조건 true 투표
+				if(Job[i]==1) {
+					for (int j = 0; j < find.length; j++) {
+						if(find[j] && Alive.get(-1).contains(j)) {
+							vote[j]++;
+							message = j+"에게 투표";
+							return message;
+						}
+					}
+				}
+				//그 외
+				switch (personal[i]) {
+				case 1:
+					//최다공론화(본인제외)
+					temp = suspect_num.clone();
+					temp[i]=0;
+					who = GameAct.FindMaxNum(temp).get( (int) (Math.random()*GameAct.FindMaxNum(temp).size()));
+					vote[who]++;
+					message = who+"에게 투표";
+					break;
+				case 0:
+					//최다공론화(본인제외)
+					temp = suspect_num.clone();
+					temp[i]=0;
+					who = GameAct.FindMaxNum(temp).get( (int) (Math.random()*GameAct.FindMaxNum(temp).size()));
+					vote[who]++;
+					message = who+"에게 투표";
+					break;
+				case -1:
+					if(!Enemy.get(i).isEmpty()) {
+						who = GameAct.RandomWho(Enemy.get(i), i);
+					}else {
+						//최다공론화(본인제외)
+						temp = suspect_num.clone();
+						temp[i]=0;
+						who = GameAct.FindMaxNum(temp).get( (int) (Math.random()*GameAct.FindMaxNum(temp).size()));
+					}
+					vote[who]++;
+					message = who+"에게 투표";
+					break;
+				case -2:
+					if(!Enemy.get(i).isEmpty()) {
+						who = GameAct.RandomWho(Enemy.get(i), i);
+					}else {
+						who = GameAct.RandomWho(GameAct.AliveAll(gameData), i);
+					}
+					vote[who]++;
+					message = who+"에게 투표";
+					break;
+				}
+			}else if(Alive.get(-1).contains(i)) {
+				switch (personal[i]) {
+				case 1:
+					//특수 직업 - 적대인물 - 랜덤 순으로 투표
+					list = new ArrayList<>();
+					for (int j = 0; j < Job_claim.length; j++) {
+						if((Job_claim[j]==1 || Job_claim[j]==2) && Alive.get(1).contains(j)) {
+							list.add(j);
+						}
+					}
+					if(!list.isEmpty()) {
+						who = GameAct.RandomWho(list, i);
+					}else {
+						who = GameAct.RandomWho(Alive.get(1), i);
+					}
+					vote[who]++;
+					message = who+"에게 투표";
+					break;
+				case 0:
+					//최다공론화(마피아 팀 제외)
+					temp = suspect_num.clone();
+					for (int j = 0; j < Alive.get(-1).size(); j++) {
+						temp[j] = 0;
+					}
+					who = GameAct.FindMaxNum(temp).get( (int) (Math.random()*GameAct.FindMaxNum(temp).size()));
+					vote[who]++;
+					message = who+"에게 투표";
+					break;
+				case -1:
+					//특수 직업 - 적대인물 - 랜덤 순으로 투표
+					list = new ArrayList<>();
+					for (int j = 0; j < Job_claim.length; j++) {
+						if((Job_claim[j]==1 || Job_claim[j]==2) && Alive.get(1).contains(j)) {
+							list.add(j);
+						}
+					}
+					if(!list.isEmpty()) {
+						who = GameAct.RandomWho(list, i);
+					}else if(!Enemy.get(i).isEmpty()){
+						who = GameAct.RandomWho(Enemy.get(i), i);
+					}else {
+						who = GameAct.RandomWho(Alive.get(1), i);
+					}
+					vote[who]++;
+					message = who+"에게 투표";
+					break;
+				case -2:
+					if(!Enemy.get(i).isEmpty()){
+						who = GameAct.RandomWho(Enemy.get(i), i);
+					}else {
+						who = GameAct.RandomWho(Alive.get(1), i);
+					}
+					vote[who]++;
+					message = who+"에게 투표";
+					break;
+				}
+			}
+		}
 		
 		return message;
 	}

@@ -248,4 +248,5 @@ public class GameAct {
 			MaxNum.sort(Comparator.reverseOrder());
 			return MaxNum;
 		}
+		
 }

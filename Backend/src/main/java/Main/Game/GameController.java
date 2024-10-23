@@ -88,8 +88,6 @@ public class GameController {
         int PlayerId = (int) request.get("PlayerId");
         int TargetId = (int) request.get("TargetId");
         Game gameData = gameSessions.get(userId);
-        
-        System.out.println(PlayerId);
 
         Map<String, String> response = new HashMap<>();
         response.put("message", GameLogic.Vote(gameData, PlayerId, TargetId));
