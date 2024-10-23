@@ -117,9 +117,6 @@ public class GameController {
 		gameData.setVote(new int[gameData.getN()]);
         
         Map<String, Integer> response = new HashMap<>();
-        System.out.println(Arrays.toString(gameData.getVote()));
-        System.out.println(prisoner);
-        System.out.println(result);
         response.put("votedPlayer", result);
         return ResponseEntity.ok(response);
     }
