@@ -171,13 +171,12 @@ public class GameLogic {
 			
 	}
 	
-	//낮에 죽은사람 확인, 투표 초기화(kill, live 는 Night()에서 초기화됨)
+	//낮에 죽은사람 확인
 	static boolean Day(Game gameData) {
 		if(gameData.getKill()!=gameData.getLive()) {
 			GameAct.Kick(gameData.getKill(), gameData);
 			return true;
 		}
-		gameData.setVote(new int[gameData.getN()]);
 		return false;
 	}
 	
@@ -299,7 +298,6 @@ public class GameLogic {
 		return message;
 	}
 	
-	//투표 초기화는 Day()에 넣어둠
 	static String Vote(Game gameData, int PlayerId, int TargetId) {
 		String message = null;
 		int[] vote = gameData.getVote();

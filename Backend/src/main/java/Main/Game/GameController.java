@@ -1,11 +1,13 @@
 package Main.Game;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -97,5 +99,29 @@ public class GameController {
                 .body(response);
     }
 
+    
+    @PostMapping("/execution")
+    public ResponseEntity<Map<String, Integer>> getExecutionResult(@RequestBody Map<String, String> request) {
+        String userId = request.get("userId"); // 요청에서 userId 추출
+        Game gameData = gameSessions.get(userId); // userId에 해당하는 게임 데이터 가져옴
+
+        // 최다 득표자 계산
+        List<Integer> prisoner = new ArrayList<>();
+		prisoner = GameAct.FindMaxNum(gameData.getVote());
+		int result = 99;
+		if(prisoner.size()==1) {
+			result = prisoner.get(0);
+			GameAct.Kick(prisoner.get(0), gameData);
+		}
+		gameData.setVote(new int[gameData.getN()]);
+        
+        Map<String, Integer> response = new HashMap<>();
+        System.out.println(Arrays.toString(gameData.getVote()));
+        System.out.println(prisoner);
+        System.out.println(result);
+        response.put("votedPlayer", result);
+        return ResponseEntity.ok(response);
+    }
+    
 }
 

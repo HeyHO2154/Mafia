@@ -87,7 +87,7 @@ class _VoteState extends State<Vote> {
           currentIndex++; // 다음 플레이어로 이동
           if (currentIndex >= alive.length) {
             // 모든 투표가 완료된 후 1초 뒤에 최다 득표자 표시
-            Future.delayed(Duration(seconds: 1), () {
+            Future.delayed(Duration(seconds: 3), () {
               _showExecutionPage();
             });
           } else if (alive[currentIndex] != player) {
