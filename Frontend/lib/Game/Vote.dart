@@ -45,7 +45,6 @@ class _VoteState extends State<Vote> {
           player = data['player']; // player 정보 저장
           job = List<int>.from(data['Job']); // Job[] 배열 저장
           alive = List<int>.from(data['alive']); // alive[] 배열 저장
-          print(alive);
           isLoading = false;
         });
         // 플레이어가 첫 번째 투표자인 경우 자동 투표를 하지 않고 직접 투표하게 함

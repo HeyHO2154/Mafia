@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +33,8 @@ public class GameController {
         Map<String, Object> response = new HashMap<>();
         response.put("player", gameData.getPlayer());  // player 정보를 반환
         response.put("Job", gameData.getJob());        // Job[] 배열 반환
+        response.put("Alive_citizen", gameData.getAlive().get(1));
+        response.put("Alive_mafia", gameData.getAlive().get(-1));       
         //전체 생존자 alive[]로 합침
         List<Integer> alive = new ArrayList<>();
         alive.addAll(gameData.getAlive().get(-1));

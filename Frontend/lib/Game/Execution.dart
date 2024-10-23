@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../MainPage/MainPage.dart';
 import '../main.dart';
 import 'Night.dart'; // Night 페이지로 이동하기 위해 import
+import 'Result.dart'; // Result 페이지로 이동하기 위해 import
 
 class Execution extends StatefulWidget {
   @override
@@ -12,18 +13,21 @@ class Execution extends StatefulWidget {
 
 class _ExecutionState extends State<Execution> {
   int votedPlayer = 99; // 기본값을 99로 설정 (동률인 경우)
+  int aliveCitizen = 0; // 시민 수
+  int aliveMafia = 0; // 마피아 수
   bool isLoading = true; // 로딩 상태를 위한 플래그
 
   @override
   void initState() {
     super.initState();
-    _fetchExecutionInfo(); // 백엔드에서 처형 정보를 받아옴
+    _fetchExecutionInfo(); // 처형 정보 API 호출
+    _fetchAliveInfo();     // Alive 정보 API 호출
   }
 
-  // 백엔드에서 처형 정보를 받아오는 함수
+  // 처형 정보를 받아오는 함수 (votedPlayer)
   Future<void> _fetchExecutionInfo() async {
     final userId = MainPage.currentUserId; // MainPage에서 userId 가져옴
-    final url = Uri.parse('${MyApp.apiUrl}/api/execution'); // 실제 API URL로 교체
+    final url = Uri.parse('${MyApp.apiUrl}/api/execution'); // 실제 API URL
 
     try {
       final response = await http.post(
@@ -35,24 +39,62 @@ class _ExecutionState extends State<Execution> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
-          votedPlayer = data['votedPlayer']; // votedPlayer 값 저장
-          isLoading = false; // 로딩 완료
+          votedPlayer = data['votedPlayer'] ?? 99; // votedPlayer 값 저장
         });
       } else {
-        print('데이터를 불러오는 데 실패했습니다.');
+        print('처형 정보를 불러오는 데 실패했습니다.');
       }
     } catch (e) {
       print('에러 발생: $e');
     }
   }
 
+  // Alive 정보를 받아오는 함수 (Alive_citizen, Alive_mafia)
+  Future<void> _fetchAliveInfo() async {
+    final userId = MainPage.currentUserId; // MainPage에서 userId 가져옴
+    final url = Uri.parse('${MyApp.apiUrl}/api/info'); // 실제 API URL
 
-  // 확인 버튼을 누르면 Night 페이지로 이동하는 함수
-  void _goToNightPage() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => Night()), // Night 페이지로 이동
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'userId': userId}), // userId를 요청 본문에 포함
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          aliveCitizen = data['Alive_citizen'].length; // aliveCitizen 수 저장
+          aliveMafia = data['Alive_mafia'].length; // aliveMafia 수 저장
+          isLoading = false; // 로딩 완료
+        });
+      } else {
+        print('Alive 정보를 불러오는 데 실패했습니다.');
+      }
+    } catch (e) {
+      print('에러 발생: $e');
+    }
+  }
+
+  // 조건에 따라 페이지 이동을 결정하는 함수
+  void _checkAndNavigate() {
+    print('마피아 수: $aliveMafia');
+    print('시민 수: $aliveCitizen');
+    // 마피아 수가 0이거나 마피아와 시민 수가 같을 경우 Result 페이지로 이동
+    if (aliveMafia == 0 || aliveMafia == aliveCitizen) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Result(),
+        ),
+      );
+    } else {
+      // 그렇지 않으면 Night 페이지로 이동
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Night()),
+      );
+    }
   }
 
   @override
@@ -80,7 +122,7 @@ class _ExecutionState extends State<Execution> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _goToNightPage, // 확인 버튼 클릭 시 Night 페이지로 이동
+              onPressed: _checkAndNavigate, // 확인 버튼 클릭 시 조건에 따라 페이지 이동
               child: Text('확인'),
             ),
           ],
