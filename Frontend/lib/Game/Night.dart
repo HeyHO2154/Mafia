@@ -143,35 +143,44 @@ class _NightState extends State<Night> {
             : Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (job![player!] == 2)
-              _buildTargetSelector('${player} 당신은 의사입니다. 누구를 치료하시겠습니까?', alive!),
-            // alive 배열에서 선택
-            if (job![player!] == 1)
-              _buildTargetSelector('${player} 당신은 경찰입니다. 누구를 조사하시겠습니까?', alive!),
-            // alive 배열에서 선택
-            if (job![player!] == 0) // 시민일 때
+            if (!alive!.contains(player))
               Column(
                 children: [
-                  Text('${player} 당신은 시민입니다. 잠을 잡니다.', style: TextStyle(fontSize: 24)),
+                  Text('당신은 죽어있습니다.', style: TextStyle(fontSize: 24)),
                   SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      selectedTarget = 99; // 시민의 경우 target을 99로 설정
-                      _submitAction();     // 그 후에 Day 페이지로 이동하는 함수 호출
-                    },
-                    child: Text('확인'),
-                  ),
                 ],
               ),
-            if (job![player!] == -1) // 마피아인 경우
-              Column(
-                children: [
-                  _buildTargetSelector('${player} 당신은 마피아입니다. 누구를 죽이시겠습니까?', alive!),
-                  SizedBox(height: 10),
-                  Text('${_getMafiaMembers()}', style: TextStyle(color: Colors.red, fontSize: 16)),
-                ],
-              ),
-          ],
+            if (alive!.contains(player)) ...[
+              if (job![player!] == 2)
+                _buildTargetSelector('${player} 당신은 의사입니다. 누구를 치료하시겠습니까?', alive!),
+              // alive 배열에서 선택
+              if (job![player!] == 1)
+                _buildTargetSelector('${player} 당신은 경찰입니다. 누구를 조사하시겠습니까?', alive!),
+              // alive 배열에서 선택
+              if (job![player!] == 0) // 시민일 때
+                Column(
+                  children: [
+                    Text('${player} 당신은 시민입니다. 잠을 잡니다.', style: TextStyle(fontSize: 24)),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        selectedTarget = 99; // 시민의 경우 target을 99로 설정
+                        _submitAction();     // 그 후에 Day 페이지로 이동하는 함수 호출
+                      },
+                      child: Text('확인'),
+                    ),
+                  ],
+                ),
+              if (job![player!] == -1) // 마피아인 경우
+                Column(
+                  children: [
+                    _buildTargetSelector('${player} 당신은 마피아입니다. 누구를 죽이시겠습니까?', alive!),
+                    SizedBox(height: 10),
+                    Text('${_getMafiaMembers()}', style: TextStyle(color: Colors.red, fontSize: 16)),
+                  ],
+                ),
+              ],
+            ],
         ),
       ),
     );
