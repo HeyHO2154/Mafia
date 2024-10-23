@@ -298,4 +298,10 @@ public class GameLogic {
 		return message;
 	}
 	
+	static String Vote(Game gameData, int PlayerId, int TargetId) {
+		String message = "hi";
+		
+		
+		return message;
+	}
 }

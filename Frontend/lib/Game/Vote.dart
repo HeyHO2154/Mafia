@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'dart:math'; // 랜덤 투표를 위해 사용
 import 'dart:async'; // Timer를 사용하기 위해 import
 
 import '../MainPage/MainPage.dart';
 import '../main.dart';
 import 'Execution.dart'; // Execution 페이지로 이동하기 위해 import
-import 'Night.dart'; // Night 페이지로 이동하기 위해 import
 
 class Vote extends StatefulWidget {
   @override
@@ -20,7 +18,6 @@ class _VoteState extends State<Vote> {
   List<int> alive = []; // 생존자 정보
   int currentIndex = 0; // 현재 표시할 플레이어 인덱스
   bool isLoading = true;
-  List<int> votes = []; // 각 플레이어가 받은 투표 수
   List<String> voteDialogue = []; // 플레이어의 투표 대사
   bool allVoted = false; // 모든 플레이어가 투표를 완료했는지 여부
 
@@ -48,12 +45,19 @@ class _VoteState extends State<Vote> {
           player = data['player']; // player 정보 저장
           job = List<int>.from(data['Job']); // Job[] 배열 저장
           alive = List<int>.from(data['alive']); // alive[] 배열 저장
-          votes = List.filled(alive.length, 0); // 생존자 수만큼 투표 수 배열 초기화
+          print(alive);
           isLoading = false;
         });
-        // 플레이어가 아닌 첫 번째 인덱스부터 자동 투표 시작
-        if (currentIndex != player) {
-          _randomVoteWithDelay();
+        // 플레이어가 첫 번째 투표자인 경우 자동 투표를 하지 않고 직접 투표하게 함
+        if (alive[currentIndex] != player) {
+          Future.delayed(Duration(seconds: 1), () {
+            _sendVoteWithTarget(alive[currentIndex], 99); //첫 요청
+          });
+        } else {
+          // 플레이어의 차례면 직접 투표할 수 있게 설정
+          setState(() {
+            // 플레이어가 직접 투표를 해야 함을 UI에 반영 (자동 투표 하지 않음)
+          });
         }
       } else {
         print('데이터를 불러오는 데 실패했습니다.');
@@ -63,72 +67,55 @@ class _VoteState extends State<Vote> {
     }
   }
 
-  // 현재 플레이어가 선택한 사람에게 투표
-  void _voteForPlayer(int target) {
-    setState(() {
-      votes[target]++; // 선택한 플레이어의 투표 수 증가
-      voteDialogue.add("플레이어 ${alive[currentIndex]}: 난 ${alive[target]}번에게 투표했어");
-      currentIndex++; // 다음 플레이어로 이동
+  // 백엔드로 자신의 번호와 타겟 ID를 보내는 함수
+  Future<void> _sendVoteWithTarget(int PlayerId, int TargetId) async {
+    final userId = MainPage.currentUserId;
+    final url = Uri.parse('${MyApp.apiUrl}/api/vote'); // 백엔드 투표 API 경로
 
-      if (currentIndex >= alive.length) {
-        // 모든 투표가 완료된 후 1초 뒤에 최다 득표자 표시
-        Future.delayed(Duration(seconds: 1), () {
-          _showExecutionPage();
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'userId': userId, 'PlayerId': PlayerId, 'TargetId': TargetId}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        String dialogue = data['message']; // 백엔드에서 반환된 대사
+        setState(() {
+          voteDialogue.add(dialogue); // 반환된 대사를 말풍선에 추가
+          currentIndex++; // 다음 플레이어로 이동
+          if (currentIndex >= alive.length) {
+            // 모든 투표가 완료된 후 1초 뒤에 최다 득표자 표시
+            Future.delayed(Duration(seconds: 1), () {
+              _showExecutionPage();
+            });
+          } else if (alive[currentIndex] != player) {
+            Future.delayed(Duration(seconds: 1), () {
+              // 플레이어가 아니라면 다시 랜덤 타겟(99)으로 보냄
+              _sendVoteWithTarget(alive[currentIndex], 99);
+            });
+          }
         });
-      } else if (currentIndex != player) {
-        // 플레이어가 아니라면 랜덤 투표 실행
-        _randomVoteWithDelay();
+      } else {
+        print('투표 요청에 실패했습니다.');
       }
-    });
-  }
-
-  // 랜덤하게 플레이어가 아닌 사람의 투표를 1초 대기 후 처리하는 함수
-  void _randomVoteWithDelay() {
-    Future.delayed(Duration(seconds: 1), () {
-      _randomVote();
-    });
-  }
-
-  // 랜덤하게 플레이어가 아닌 사람의 투표를 처리하는 함수
-  void _randomVote() {
-    final random = Random();
-    int target = random.nextInt(alive.length); // 랜덤하게 생존자 중 한 명을 선택
-    while (target == currentIndex) {
-      // 자신에게 투표하는 것을 방지
-      target = random.nextInt(alive.length);
+    } catch (e) {
+      print('에러 발생: $e');
     }
-
-    setState(() {
-      votes[target]++; // 선택한 플레이어의 투표 수 증가
-      voteDialogue.add("플레이어 ${alive[currentIndex]}: 난 ${alive[target]}번에게 투표했어");
-      currentIndex++; // 다음 플레이어로 이동
-
-      if (currentIndex >= alive.length) {
-        // 모든 투표가 완료된 후 1초 뒤에 최다 득표자 표시
-        Future.delayed(Duration(seconds: 1), () {
-          _showExecutionPage();
-        });
-      } else if (currentIndex != player) {
-        // 플레이어가 아니라면 다시 랜덤 투표
-        _randomVoteWithDelay();
-      }
-    });
   }
 
-  // 최다 득표자를 계산하는 함수
-  int _getTopVotedPlayer() {
-    int maxVotes = votes.reduce((curr, next) => curr > next ? curr : next);
-    return votes.indexOf(maxVotes);
+  // 플레이어가 직접 선택한 타겟에게 투표하는 함수
+  Future<void> _voteForPlayer(int target) async {
+    // 플레이어의 선택된 타겟을 백엔드로 전송
+    await _sendVoteWithTarget(player, target);
   }
 
   // 투표 결과 페이지로 이동
   void _showExecutionPage() {
-    int topVotedPlayer = _getTopVotedPlayer(); // 최다 득표자 계산
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => Execution(topVotedPlayer: alive[topVotedPlayer]),
-      ),
+      MaterialPageRoute(builder: (context) => Execution()),
     );
   }
 
@@ -170,7 +157,7 @@ class _VoteState extends State<Vote> {
                             ],
                           ),
                           child: Text(
-                            '난 ${alive[votes.indexOf(votes[alive.indexOf(playerId)])]}번에게 투표했어',
+                            voteDialogue[alive.indexOf(playerId)], // 받아온 대사 출력
                             style: TextStyle(color: Colors.black),
                           ),
                         ),
@@ -187,11 +174,11 @@ class _VoteState extends State<Vote> {
                   ),
                 );
               }).toList(),
-            )
+            ),
           ),
 
           // 현재 플레이어에게 투표할 대상을 선택하게 함
-          if (currentIndex == player)
+          if (currentIndex < alive.length && alive[currentIndex] == player)
             Align(
               alignment: Alignment.bottomCenter,
               child: Column(
@@ -204,9 +191,9 @@ class _VoteState extends State<Vote> {
                       return ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                          backgroundColor: Colors.blue, // 심플한 버튼 스타일
+                          backgroundColor: Colors.blue[50], // 심플한 버튼 스타일
                         ),
-                        onPressed: () => _voteForPlayer(alive.indexOf(playerId)),
+                        onPressed: () => _voteForPlayer(playerId), // 플레이어의 선택된 타겟 전송
                         child: Text(
                           '$playerId번',
                           style: TextStyle(fontSize: 16),

@@ -81,6 +81,23 @@ public class GameController {
                 .header("Content-Type", "application/json; charset=UTF-8")  // UTF-8로 인코딩
                 .body(response);
     }
+    
+    @PostMapping("/vote")
+    public ResponseEntity<Map<String, String>> vote(@RequestBody Map<String, Object> request) {
+    	String userId = (String) request.get("userId");
+        int PlayerId = (int) request.get("PlayerId");
+        int TargetId = (int) request.get("TargetId");
+        Game gameData = gameSessions.get(userId);
+        
+        System.out.println(PlayerId);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", GameLogic.Vote(gameData, PlayerId, TargetId));
+        return ResponseEntity
+                .ok()
+                .header("Content-Type", "application/json; charset=UTF-8")  // UTF-8로 인코딩
+                .body(response);
+    }
 
 }
 
