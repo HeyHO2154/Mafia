@@ -49,7 +49,7 @@ public class GameController {
         String userId = (String) request.get("userId");
         Game gameData = gameSessions.get(userId);
         
-        gameData.getPick()[gameData.getPlayer()] = (Integer) request.get("target");
+        gameData.getPick()[gameData.getPlayer()] = (Integer) request.get("target"); 
         GameLogic.Night(gameData); //밤 로직 처리
     }
     

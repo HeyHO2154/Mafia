@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // JSON 데이터를 파싱하기 위해 필요
 
+import '../main.dart';
 import 'MultiPlay.dart';
 import 'MyInfo.dart';
-import 'Guide.dart';
 import 'Shop.dart';
 import 'SinglePlay.dart';
 
@@ -31,7 +31,7 @@ class _MainPageState extends State<MainPage> {
 
   // userId에 맞는 포인트 데이터를 백엔드에서 가져옴
   Future<void> _getPointValue() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:8080/api/points?userId=${widget.userId}'));
+    final response = await http.get(Uri.parse('${MyApp.apiUrl}/api/points?userId=${widget.userId}'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -65,15 +65,15 @@ class _MainPageState extends State<MainPage> {
             ),
             SizedBox(height: 100),
             Text(
-              '싱글 마피아 게임',
+              'AI 마피아',
               style: TextStyle(
-                fontSize: 40,
+                fontSize: 50,
                 fontWeight: FontWeight.bold,
                 color: Colors.brown,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 100),
+            SizedBox(height: 0),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(15.0),
@@ -127,21 +127,6 @@ class _MainPageState extends State<MainPage> {
                       ],
                     ),
                   ],
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Guide()), // Guide로 이동
-                );
-              },
-              child: Text(
-                '게임 설명',
-                style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
