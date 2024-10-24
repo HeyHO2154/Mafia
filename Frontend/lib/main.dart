@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '싱글 마피아',
+      title: 'AI 마피아',
       home: HomePage(), // 홈 페이지를 초기 화면으로 설정
     );
   }
